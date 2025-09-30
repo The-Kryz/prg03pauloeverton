@@ -61,9 +61,11 @@ public class Genio extends javax.swing.JFrame {
 
     private void btnpalpiteActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnpalpiteActionPerformed
        
-        int random = (int) (Math.random() * 5) + 1;
-        int palpite = (Integer) spnpalpite.getValue();
+        int random = (int) (Math.random() * 5) + 1; // pega um numero de 1 a 5 aleatorio
+        int palpite = (Integer) spnpalpite.getValue(); // pega o valor do spinner
         
+        
+        //condição se acertou ou errou
         if (random == palpite){
             lblakinatormessage.setText("Você acertou, meu numero era o " + random);
         }else{
