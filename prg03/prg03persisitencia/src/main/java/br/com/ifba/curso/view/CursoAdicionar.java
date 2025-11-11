@@ -5,6 +5,8 @@
 package br.com.ifba.curso.view;
 
 import br.com.ifba.CursoSave; // Importa nosso DAO, a classe que "fala" com o banco.
+import br.com.ifba.curso.dao.CursoDao;
+import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).
 import javax.swing.JOptionPane;
 
@@ -126,7 +128,7 @@ public class CursoAdicionar extends javax.swing.JDialog {
         // são "arriscadas" e podem falhar (ex: banco offline, código duplicado).
         try {
             // 3. Cria uma instância do nosso DAO (o "garçom" que fala com o banco).
-            CursoSave cursoDAO = new CursoSave();
+            CursoIDao cursoDAO = new CursoDao();
 
             // 4. "Entrega" o objeto 'curso' (preenchido) para o método 'salvar' do DAO.
             //    O DAO fará todo o trabalho de 'persist' e 'commit'.

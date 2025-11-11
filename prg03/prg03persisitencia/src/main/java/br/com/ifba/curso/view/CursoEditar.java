@@ -5,6 +5,8 @@
 package br.com.ifba.curso.view;
 
 import br.com.ifba.CursoSave; // Importa nosso DAO, a classe que "fala" com o banco.
+import br.com.ifba.curso.dao.CursoDao;
+import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).
 import javax.swing.JOptionPane;
 
@@ -130,10 +132,10 @@ public class CursoEditar extends javax.swing.JDialog {
         // 4. Tenta salvar a atualização no banco de dados
         try {
             // 5. Cria o DAO
-            CursoSave dao = new CursoSave();
+            CursoIDao cursoDAO = new CursoDao();
 
             // 6. Chama o novo método ATUALIZAR
-            dao.atualizar(this.cursoParaEditar);
+            cursoDAO.atualizar(this.cursoParaEditar);
 
             // 7. Se deu certo, mostra mensagem de sucesso
             JOptionPane.showMessageDialog(this,
@@ -163,6 +165,7 @@ public class CursoEditar extends javax.swing.JDialog {
         if (this.cursoParaEditar != null) {
             txtNomeedit.setText(this.cursoParaEditar.getNome());
             txtCodigoedit.setText(this.cursoParaEditar.getCodigoCurso());
+            txtCodigoedit.setEnabled(false);
         }
     }
 

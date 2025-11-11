@@ -5,6 +5,8 @@
 package br.com.ifba.curso.view;
 
 import br.com.ifba.CursoSave; // Importa nosso DAO, a classe que "fala" com o banco.
+import br.com.ifba.curso.dao.CursoDao;
+import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).
 import java.util.List; // Usado para receber a lista de cursos do banco.
 import javax.swing.JOptionPane;
@@ -205,10 +207,10 @@ public class CursoListar extends javax.swing.JFrame {
         btnExcluir.setEnabled(false);
 
         // 3. Cria uma instância do nosso DAO (a classe que "fala" com o banco).
-        CursoSave dao = new CursoSave();
+        CursoIDao cursoDAO = new CursoDao();
 
         // 4. Chama o método do DAO que vai ao banco e retorna a lista de Cursos.
-        List<Curso> cursos = dao.listarTodos();
+        List<Curso> cursos = cursoDAO.listarTodos();
 
         // 5. Boa prática: Verifica se a lista não veio nula 
         //    (o que pode acontecer se o DAO der erro e retornar 'null').
@@ -267,8 +269,8 @@ public class CursoListar extends javax.swing.JFrame {
         String codigoCurso = (String) tblCurso.getModel().getValueAt(modelRow, 1);
 
         // 5. USA O DAO para buscar o objeto 'Curso' COMPLETO no banco
-        CursoSave dao = new CursoSave();
-        Curso cursoParaEditar = dao.buscarPorCodigo(codigoCurso);
+        CursoIDao cursoDAO = new CursoDao();
+        Curso cursoParaEditar = cursoDAO.buscarPorCodigo(codigoCurso);
 
         // 6. Verifica se o curso foi encontrado
         if (cursoParaEditar != null) {
@@ -324,14 +326,14 @@ public class CursoListar extends javax.swing.JFrame {
         // 6. Verifica se o usuário clicou em "SIM" (YES_OPTION)
         if (confirm == JOptionPane.YES_OPTION) {
 
-            CursoSave dao = new CursoSave();
+            CursoIDao cursoDAO = new CursoDao();
             try {
                 // 7. Busca o objeto 'Curso' COMPLETO usando o código
-                Curso cursoParaExcluir = dao.buscarPorCodigo(codigoCurso);
+                Curso cursoParaExcluir = cursoDAO.buscarPorCodigo(codigoCurso);
 
                 if (cursoParaExcluir != null) {
                     // 8. Chama o método de excluir do DAO
-                    dao.excluir(cursoParaExcluir);
+                    cursoDAO.excluir(cursoParaExcluir);
 
                     // 9. Mostra mensagem de sucesso
                     JOptionPane.showMessageDialog(this, "Curso excluído com sucesso!");
