@@ -4,7 +4,6 @@
  */
 package br.com.ifba.infrastructure.dao;
 
-import br.com.ifba.curso.entity.Curso;
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityManagerFactory;
@@ -14,7 +13,7 @@ import java.util.List;
 
 public class GenericDao<Entity extends PersistenceEntity> implements GenericIDao<Entity> {
 
-   protected static EntityManagerFactory entityManagerFactory
+    protected static EntityManagerFactory entityManagerFactory
             = Persistence.createEntityManagerFactory("gerenciamento_curso");
 
     @Override
@@ -67,12 +66,15 @@ public class GenericDao<Entity extends PersistenceEntity> implements GenericIDao
         try {
 
             entityManager.getTransaction().begin();
-            entityManager.merge(entity);
-            entityManager.getTransaction().commit();
 
+            Entity entityAnexada = entityManager.merge(entity);
+
+            entityManager.remove(entityAnexada);
+
+            entityManager.getTransaction().commit();
         } catch (Exception e) {
             if (entityManager.getTransaction().isActive()) {
-                entityManager.getTransaction().rollback(); // Desfaz em caso de erro
+                entityManager.getTransaction().rollback();
             }
             System.err.println("Erro ao excluir a Entidade: " + e.getMessage());
             throw e;
@@ -95,10 +97,17 @@ public class GenericDao<Entity extends PersistenceEntity> implements GenericIDao
         }
     }
 
+// CÓDIGO CORRETO
     @Override
     public Entity buscarId(Long id) {
         EntityManager entityManager = entityManagerFactory.createEntityManager();
-        return (Entity) entityManager.find(getTypeClass(), id);
+
+        // Use try...finally para garantir que o EM sempre será fechado
+        try {
+            return (Entity) entityManager.find(getTypeClass(), id);
+        } finally {
+            entityManager.close(); // <-- ISTO É ESSENCIAL
+        }
     }
 
     protected Class<?> getTypeClass() {

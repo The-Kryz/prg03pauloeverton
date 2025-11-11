@@ -4,7 +4,6 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.CursoSave; // Importa nosso DAO, a classe que "fala" com o banco.
 import br.com.ifba.curso.dao.CursoDao;
 import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).
@@ -224,8 +223,6 @@ public class CursoListar extends javax.swing.JFrame {
                     //    IMPORTANTE: A ordem aqui deve ser a mesma das colunas da tabela.
                     curso.getNome(), // Coluna 0: "Nome"
                     curso.getCodigoCurso(), // Coluna 1: "Codigo do Curso"
-                    null, // Coluna 2: "Remover" (ainda não implementado)
-                    null // Coluna 3: "Editar" (ainda não implementado)
                 });
             }
         }

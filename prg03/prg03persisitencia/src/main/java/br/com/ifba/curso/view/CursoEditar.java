@@ -4,7 +4,6 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.CursoSave; // Importa nosso DAO, a classe que "fala" com o banco.
 import br.com.ifba.curso.dao.CursoDao;
 import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).

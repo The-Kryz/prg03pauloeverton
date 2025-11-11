@@ -5,12 +5,12 @@
 package br.com.ifba.infrastructure.dao;
 
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
-import jakarta.persistence.Entity;
 import java.util.List;
 
 /**
  *
  * @author dudan
+ * @param <Entity>
  */
 public interface GenericIDao<Entity extends PersistenceEntity> {
 

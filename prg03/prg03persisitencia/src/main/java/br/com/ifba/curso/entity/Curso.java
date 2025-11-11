@@ -9,9 +9,6 @@ package br.com.ifba.curso.entity;
  */
 import br.com.ifba.infrastructure.entity.PersistenceEntity;
 import jakarta.persistence.Entity; // Anotação OBRIGATÓRIA. Diz ao JPA: "Esta classe é uma tabela!".
-import jakarta.persistence.GeneratedValue; // Usado para definir como o ID será gerado (ex: auto-incremento).
-import jakarta.persistence.GenerationType; // Define a ESTRATÉGIA de geração de ID (AUTO, IDENTITY, etc.).
-import jakarta.persistence.Id; // Anotação OBRIGATÓRIA. Marca qual campo é a Chave Primária (Primary Key).
 import java.io.Serializable;
 
 /**
