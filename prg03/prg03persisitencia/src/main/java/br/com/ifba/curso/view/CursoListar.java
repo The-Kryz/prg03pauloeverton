@@ -4,8 +4,6 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.curso.dao.CursoDao;
-import br.com.ifba.curso.dao.CursoIDao;
 import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).
 import java.util.List; // Usado para receber a lista de cursos do banco.
 import javax.swing.JOptionPane;
@@ -16,6 +14,8 @@ import javax.swing.event.DocumentListener; // "Ouvinte" que monitora mudanças e
 import javax.swing.event.DocumentEvent; // O "evento" que o DocumentListener escuta (ex: digitação).
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import br.ifba.com.curso.controller.CursoController;
+import br.ifba.com.curso.controller.CursoIController;
 
 /**
  *
@@ -206,10 +206,10 @@ public class CursoListar extends javax.swing.JFrame {
         btnExcluir.setEnabled(false);
 
         // 3. Cria uma instância do nosso DAO (a classe que "fala" com o banco).
-        CursoIDao cursoDAO = new CursoDao();
+        CursoIController cursoController = new CursoController();
 
         // 4. Chama o método do DAO que vai ao banco e retorna a lista de Cursos.
-        List<Curso> cursos = cursoDAO.listarTodos();
+        List<Curso> cursos = cursoController.listarTodos();
 
         // 5. Boa prática: Verifica se a lista não veio nula 
         //    (o que pode acontecer se o DAO der erro e retornar 'null').
@@ -266,8 +266,8 @@ public class CursoListar extends javax.swing.JFrame {
         String codigoCurso = (String) tblCurso.getModel().getValueAt(modelRow, 1);
 
         // 5. USA O DAO para buscar o objeto 'Curso' COMPLETO no banco
-        CursoIDao cursoDAO = new CursoDao();
-        Curso cursoParaEditar = cursoDAO.buscarPorCodigo(codigoCurso);
+        CursoIController cursoController = new CursoController();
+        Curso cursoParaEditar = cursoController.buscarPorCodigo(codigoCurso);
 
         // 6. Verifica se o curso foi encontrado
         if (cursoParaEditar != null) {
@@ -323,14 +323,14 @@ public class CursoListar extends javax.swing.JFrame {
         // 6. Verifica se o usuário clicou em "SIM" (YES_OPTION)
         if (confirm == JOptionPane.YES_OPTION) {
 
-            CursoIDao cursoDAO = new CursoDao();
+            CursoIController cursoController = new CursoController();
             try {
                 // 7. Busca o objeto 'Curso' COMPLETO usando o código
-                Curso cursoParaExcluir = cursoDAO.buscarPorCodigo(codigoCurso);
+                Curso cursoParaExcluir = cursoController.buscarPorCodigo(codigoCurso);
 
                 if (cursoParaExcluir != null) {
                     // 8. Chama o método de excluir do DAO
-                    cursoDAO.excluir(cursoParaExcluir);
+                    cursoController.excluir(cursoParaExcluir);
 
                     // 9. Mostra mensagem de sucesso
                     JOptionPane.showMessageDialog(this, "Curso excluído com sucesso!");
