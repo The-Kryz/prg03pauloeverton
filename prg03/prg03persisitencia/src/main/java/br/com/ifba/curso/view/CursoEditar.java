@@ -4,35 +4,41 @@
  */
 package br.com.ifba.curso.view;
 
-import br.com.ifba.curso.entity.Curso; // Importa a Entidade (o "molde" dos dados).
+import br.com.ifba.curso.entity.Curso; // Entidade que está sendo editada
 import javax.swing.JOptionPane;
-import br.ifba.com.curso.controller.CursoController;
-import br.ifba.com.curso.controller.CursoIController;
+import br.com.ifba.curso.controller.CursoIController; // Interface do Controller (o Garçom)
 
 /**
- *
- * @author dudan
+ * CLASSE VIEW (TELA DE EDIÇÃO) * Função: Receber um objeto de Curso existente,
+ * permitir a alteração e mandar atualizar. * Analogia: O Formulário de Correção
+ * de Dados.
  */
 public class CursoEditar extends javax.swing.JDialog {
 
-    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CursoEditar.class.getName());
-
+// Variáveis que vão guardar os dados e o Garçom para trabalhar
     private Curso cursoParaEditar;
+    private CursoIController cursoController;
 
     /**
-     * Creates new form CursoEditar
+     * CONSTRUTOR MODIFICADO * Função: Receber todos os dados necessários de
+     * quem chamou a tela. * 4 PARÂMETROS: (Pai, Se é modal, O Curso, O
+     * Controller)
      */
-    public CursoEditar(java.awt.Frame parent, boolean modal, Curso curso) {
-        super(parent, modal); // Chama o construtor do JDialog
+    public CursoEditar(java.awt.Frame parent, boolean modal, Curso curso, CursoIController controller) {
+        super(parent, modal);
         initComponents();
 
-        // 1. Salva o objeto 'curso' que recebemos como PARÂMETRO
+        // 1. Guarda o objeto 'Curso' que veio do banco.
+        // Ele tem o ID, o nome antigo, o código antigo, etc.
         this.cursoParaEditar = curso;
 
-        // 2. Preenche os campos da tela
+        // 2. Guarda o Controller que veio da tela principal (Injeção Manual).
+        this.cursoController = controller;
+
+        // 3. Preenche a tela com os dados atuais do objeto.
         preencherCampos();
 
-        // 3. Centraliza a tela
+        // 4. Centraliza a tela em relação à janela principal.
         this.setLocationRelativeTo(parent);
     }
 
@@ -111,46 +117,36 @@ public class CursoEditar extends javax.swing.JDialog {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+    /**
+     * MÉTODO DO BOTÃO "EDITAR CURSO" * Função: Coletar os novos dados,
+     * atualizar o objeto na memória e mandar salvar.
+     */
     private void btnEditarcursoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEditarcursoActionPerformed
-// 1. Pega o NOVO nome que o usuário digitou
+        // 1. Pega o NOVO nome do campo de texto
         String novoNome = txtNomeedit.getText();
 
-        // 2. Validação simples (vê se o campo não está vazio)
-        if (novoNome.trim().isEmpty()) {
-            JOptionPane.showMessageDialog(this,
-                    "O nome do curso não pode ficar em branco.",
-                    "Erro de Validação",
-                    JOptionPane.WARNING_MESSAGE);
-            return; // Para a execução
-        }
-        // 3. Atualiza o objeto 'cursoParaEditar' que está na memória
+        // ** (Faltaria aqui a validação de campo vazio, que o Service fará) **
+        // this.cursoParaEditar.setNome(novoNome); // Linha já abaixo
+        // 2. Atualiza o objeto 'cursoParaEditar' na memória com o novo nome.
+        // O código do curso (chave primária) NÃO deve ser alterado.
         this.cursoParaEditar.setNome(novoNome);
-        // (Não precisamos mexer no código, pois ele não mudou)
 
-        // 4. Tenta salvar a atualização no banco de dados
+        // 3. Chama a lógica de atualização.
         try {
-            // 5. Cria o DAO
-            CursoIController cursoController = new CursoController();
-            cursoController.salvar(this.cursoParaEditar);
+            // PONTO CHAVE: Usamos o método 'atualizar'.
+            // Por quê? Porque 'cursoParaEditar' já existe no banco (tem ID).
+            // Se usássemos 'salvar', o Hibernate daria erro de "detached entity".
+            this.cursoController.atualizar(this.cursoParaEditar); // <--- ATUALIZAR (MERGE)
 
-            // 7. Se deu certo, mostra mensagem de sucesso
-            JOptionPane.showMessageDialog(this,
-                    "Curso atualizado com sucesso!",
-                    "Sucesso",
-                    JOptionPane.INFORMATION_MESSAGE);
+            // SUCESSO
+            JOptionPane.showMessageDialog(this, "Curso atualizado com sucesso!");
 
-            // 8. FECHA esta tela (JDialog)
-            //    Isso fará o código na 'CursoListar' (no btnEditar) continuar
-            //    e atualizar a tabela.
+            // Fecha a janela. O código na 'CursoListar' continua e atualiza a tabela.
             this.dispose();
 
         } catch (Exception e) {
-            // 9. Se o DAO deu erro (ex: nome duplicado, erro de banco)
-            JOptionPane.showMessageDialog(this,
-                    "Falha ao atualizar o curso: " + e.getMessage(),
-                    "Erro de Banco de Dados",
-                    JOptionPane.ERROR_MESSAGE);
+            // FALHA: Captura erros de validação (do Service) ou de banco de dados (DAO).
+            JOptionPane.showMessageDialog(this, "Erro: " + e.getMessage());
         }
     }//GEN-LAST:event_btnEditarcursoActionPerformed
 
@@ -162,6 +158,8 @@ public class CursoEditar extends javax.swing.JDialog {
         if (this.cursoParaEditar != null) {
             txtNomeedit.setText(this.cursoParaEditar.getNome());
             txtCodigoedit.setText(this.cursoParaEditar.getCodigoCurso());
+            // Bloqueamos a edição do código para garantir que a chave primária
+            // da tabela não seja alterada (regra de negócio comum).
             txtCodigoedit.setEnabled(false);
         }
     }
@@ -169,38 +167,17 @@ public class CursoEditar extends javax.swing.JDialog {
     /**
      * @param args the command line arguments
      */
+// --- BLOCO MAIN (APENAS PARA TESTE VISUAL) ---
     public static void main(String args[]) {
-        /* Set the Nimbus look and feel */
-        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
-        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
-         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
-         */
-        try {
-            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
-                if ("Nimbus".equals(info.getName())) {
-                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
-                    break;
-                }
-            }
-        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
-            logger.log(java.util.logging.Level.SEVERE, null, ex);
-        }
-        //</editor-fold>
-
-        /* Create and display the form */
+        // ... (código do LookAndFeel) ...
         java.awt.EventQueue.invokeLater(() -> {
-            // Cria um "pai" e um "curso" falsos só para o 'main' funcionar
+            // Cria um objeto falso para a tela ter o que mostrar no modo de teste.
             Curso cursoFalso = new Curso();
             cursoFalso.setNome("Curso de Teste");
             cursoFalso.setCodigoCurso("TST01");
 
-            CursoEditar dialog = new CursoEditar(new javax.swing.JFrame(), true, cursoFalso);
-            dialog.addWindowListener(new java.awt.event.WindowAdapter() {
-                @Override
-                public void windowClosing(java.awt.event.WindowEvent e) {
-                    System.exit(0);
-                }
-            });
+            // Passamos 'null' para o controller, pois o Spring não está ligado.
+            CursoEditar dialog = new CursoEditar(new javax.swing.JFrame(), true, cursoFalso, null);
             dialog.setVisible(true);
         });
     }

@@ -5,36 +5,40 @@
 package br.com.ifba.infrastructure.entity;
 
 import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Entity; // Anotação OBRIGATÓRIA. Diz ao JPA: "Esta classe é uma tabela!".
-import jakarta.persistence.GeneratedValue; // Usado para definir como o ID será gerado (ex: auto-incremento).
-import jakarta.persistence.GenerationType; // Define a ESTRATÉGIA de geração de ID (AUTO, IDENTITY, etc.).
-import jakarta.persistence.Id; // Anotação OBRIGATÓRIA. Marca qual campo é a Chave Primária (Primary Key).
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-@MappedSuperclass
+/**
+ * CLASSE ENTIDADE BASE * Função: Criar os campos que são comuns a TODAS as
+ * tabelas do seu sistema, como a Chave Primária (ID). * Analogia: O Documento
+ * de Identidade Base. Toda pessoa (Entidade) tem que ter um ID, então definimos
+ * a estrutura dele aqui.
+ */
+@MappedSuperclass // <--- ANOTAÇÃO CHAVE: Diz para o JPA:
+// "Não crie uma tabela para esta classe no banco de dados. 
+// Apenas use seus campos como herança (template) para quem a estender."
 public class PersistenceEntity {
 
     /**
-     * Campo da Chave Primária (Primary Key). O 'L' maiúsculo em 'Long' permite
-     * que o valor seja 'null', o que é uma boa prática para entidades (embora a
-     * chave primária nunca será nula no banco).
+     * Campo da Chave Primária (ID)
      */
-    @Id // ANOTAÇÃO: Marca o campo 'id' como a chave primária da tabela.
+    @Id // ANOTAÇÃO: Marca o campo 'id' como a Chave Primária (PK).
 
     /**
-     * ANOTAÇÃO: Define a estratégia de geração da chave primária.
-     *
-     * - GenerationType.AUTO: (O que você usou) Deixa o Hibernate "adivinhar".
-     * Com o MySQL, isso geralmente faz o Hibernate criar uma tabela extra (ex:
-     * 'curso_seq') para controlar os IDs. É funcional, mas não ideal.
-     *
-     * - GenerationType.IDENTITY: (RECOMENDADO PARA MYSQL) Diz ao Hibernate para
-     * usar a coluna 'AUTO_INCREMENT' nativa do MySQL. É mais simples, mais
-     * rápido e não cria tabelas extras. Recomendo mudar para 'IDENTITY' quando
-     * puder.
+     * @GeneratedValue: Define como o valor do ID será gerado. * strategy =
+     * GenerationType.AUTO: * Diz ao Hibernate para escolher a melhor forma de
+     * gerar o ID * para o seu banco de dados (MySQL/Postgres/etc.). *
+     * RECOMENDAÇÃO: Se você usa MySQL, é melhor usar:
+     * @GeneratedValue(strategy = GenerationType.IDENTITY) Isso força o
+     * Hibernate a usar o recurso nativo 'AUTO_INCREMENT' do MySQL, o que é mais
+     * limpo e não cria tabelas extras de controle de sequência.
      */
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
+    // --- GETTERS E SETTERS ---
+    // Métodos essenciais para o Hibernate conseguir ler e escrever o ID da Entidade.
     public Long getId() {
         return id;
     }

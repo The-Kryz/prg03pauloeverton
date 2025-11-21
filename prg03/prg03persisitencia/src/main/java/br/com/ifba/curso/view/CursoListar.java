@@ -14,63 +14,65 @@ import javax.swing.event.DocumentListener; // "Ouvinte" que monitora mudanças e
 import javax.swing.event.DocumentEvent; // O "evento" que o DocumentListener escuta (ex: digitação).
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import br.ifba.com.curso.controller.CursoController;
-import br.ifba.com.curso.controller.CursoIController;
+import br.com.ifba.curso.controller.CursoIController;
+import jakarta.annotation.PostConstruct; // Importante para o Spring/Swing
+import org.springframework.beans.factory.annotation.Autowired; // Essencial para a Injeção
+import org.springframework.stereotype.Component; // A anotação chave
 
 /**
- *
- * @author dudan
+ * CLASSE VIEW (TELA PRINCIPAL) * Função: Mostrar dados, capturar eventos de
+ * botão e repassar para o Controller. * Analogia: O Dashboard ou a Vitrine. É a
+ * única camada que o usuário toca.
  */
+@Component // <--- ETIQUETA DO SPRING
+// Diz ao Spring: "Isso é um componente. Crie ele e gerencie suas dependências".
+// Isso permite que o Prg03Application.main peça essa tela ao Spring (context.getBean).
 public class CursoListar extends javax.swing.JFrame {
+
+    // @Autowired: INJEÇÃO DE DEPENDÊNCIA
+    // O Spring lê isso e diz: "Essa tela precisa de um Garçom (Controller)? Toma, aqui está ele pronto."
+    // NUNCA fazemos 'new CursoController()' aqui!
+    @Autowired
+    private CursoIController cursoController;
 
     private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(CursoListar.class.getName());
 
-    /**
-     * Variável que armazena o 'filtrador' da nossa tabela. É o cérebro por trás
-     * da funcionalidade de pesquisa. Ela é declarada aqui (nível da classe)
-     * para que todos os métodos (como 'filtrar()' e o construtor) possam
-     * acessá-la.
-     */
     private TableRowSorter<DefaultTableModel> sorter;
 
     /**
-     * Construtor da classe. É executado UMA VEZ quando a tela é criada.
-     * Perfeito para configurações iniciais.
+     * Construtor da classe. ATENÇÃO: Neste momento, o 'cursoController' PODE
+     * AINDA ESTAR NULO. Por isso, só fazemos configurações visuais ou de
+     * listeners.
      */
     public CursoListar() {
-        // Método auto-gerado pelo NetBeans para criar e posicionar
-        // os componentes visuais (botões, tabela, etc.) que você desenhou.
-        initComponents();
+        initComponents(); // Inicializa os componentes do NetBeans
 
-        // --- Bloco de Configuração do Filtro da Tabela ---
-        // 1. Pega o "modelo" da tabela. O modelo é quem realmente guarda e 
-        //    gerencia os dados (as linhas e colunas) da JTable.
+        // Configurações da Tabela e Filtros (código Swing normal)
         DefaultTableModel model = (DefaultTableModel) tblCurso.getModel();
-
-        // 2. Cria o objeto 'sorter' (filtrador) e o associa ao 'modelo' da nossa tabela.
         sorter = new TableRowSorter<>(model);
-
-        // 3. 'Conecta' o sorter à JTable (tblCurso). 
-        //    Agora a sua JTable sabe como ser filtrada e ordenada.
         tblCurso.setRowSorter(sorter);
 
-        //inicia os botões desabilitados
         btnEditar.setEnabled(false);
         btnExcluir.setEnabled(false);
 
         adicionarListenerSelecaoTabela();
-
-        // --- Fim do Bloco de Configuração do Filtro ---
-        // Configura o "ouvinte" (listener) para o campo de pesquisa (txtPesquisar).
-        // Isso faz com que a aplicação "sinta" cada tecla digitada.
         adicionarFiltroListener();
 
-        // Chama o método para buscar os dados no banco de dados
-        // e popular a tabela assim que a tela é aberta.
-        preencherTabela();
+        // O carregamento inicial da tabela (preencherTabela()) foi MOVIDO para o @PostConstruct
     }
 
-    @SuppressWarnings("unchecked")
+    /**
+     * MÉTODO DE INICIALIZAÇÃO SEGURA
+     *
+     * @PostConstruct: "Rode este método SOMENTE depois que todos os objetos
+     * (incluindo o 'cursoController') forem injetados e estiverem prontos."
+     * Analogia: É a última checagem antes de abrir a loja.
+     */
+    @PostConstruct
+    public void aposInicializar() {
+        preencherTabela(); // É seguro chamar o Controller agora
+        this.setVisible(true);
+    }
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
@@ -193,37 +195,18 @@ public class CursoListar extends javax.swing.JFrame {
      * é chamado na inicialização da tela e após adicionar um novo curso.
      */
     private void preencherTabela() {
-
-        // 1. Pega o "modelo" da tabela (DefaultTableModel) para que possamos 
-        //    adicionar ou remover linhas dele.
         DefaultTableModel model = (DefaultTableModel) tblCurso.getModel();
+        model.setRowCount(0); // Limpa a tabela para evitar duplicatas
 
-        // 2. Linha CRUCIAL: Limpa a tabela, removendo todas as linhas antigas.
-        //    Isso evita duplicar dados toda vez que atualizamos.
-        model.setRowCount(0);
+        // O Controller injetado é usado para buscar os dados.
+        List<Curso> cursos = this.cursoController.listarTodos(); // <- CHAMA O MUNDO SPRING
 
-        btnEditar.setEnabled(false);
-        btnExcluir.setEnabled(false);
-
-        // 3. Cria uma instância do nosso DAO (a classe que "fala" com o banco).
-        CursoIController cursoController = new CursoController();
-
-        // 4. Chama o método do DAO que vai ao banco e retorna a lista de Cursos.
-        List<Curso> cursos = cursoController.listarTodos();
-
-        // 5. Boa prática: Verifica se a lista não veio nula 
-        //    (o que pode acontecer se o DAO der erro e retornar 'null').
         if (cursos != null) {
-            // 6. Itera (passa por) cada objeto 'curso' dentro da lista 'cursos'.
             for (Curso curso : cursos) {
-
-                // 7. Adiciona uma nova linha na tabela.
+                // Adiciona a linha na tabela
                 model.addRow(new Object[]{
-                    // 8. Cria um "array de objetos" que representa os dados de UMA linha.
-                    //    IMPORTANTE: A ordem aqui deve ser a mesma das colunas da tabela.
-                    curso.getNome(), // Coluna 0: "Nome"
-                    curso.getCodigoCurso(), // Coluna 1: "Codigo do Curso"
-                });
+                    curso.getNome(),
+                    curso.getCodigoCurso(),});
             }
         }
     }
@@ -233,7 +216,7 @@ public class CursoListar extends javax.swing.JFrame {
         //    Passamos 'this' (a tela CursoListar) como "pai"
         //    Passamos 'true' para dizer que ela é "MODAL" (ela trava a tela 'mãe'
         //    enquanto estiver aberta).
-        CursoAdicionar telaAdicionar = new CursoAdicionar(this, true);
+        CursoAdicionar telaAdicionar = new CursoAdicionar(this, true, this.cursoController);
 
         // 2. Mostra a tela de adicionar. 
         //    IMPORTANTE: Como ela é 'modal', o CÓDIGO AQUI PAUSA 
@@ -266,8 +249,7 @@ public class CursoListar extends javax.swing.JFrame {
         String codigoCurso = (String) tblCurso.getModel().getValueAt(modelRow, 1);
 
         // 5. USA O DAO para buscar o objeto 'Curso' COMPLETO no banco
-        CursoIController cursoController = new CursoController();
-        Curso cursoParaEditar = cursoController.buscarPorCodigo(codigoCurso);
+        Curso cursoParaEditar = this.cursoController.buscarPorCodigo(codigoCurso);
 
         // 6. Verifica se o curso foi encontrado
         if (cursoParaEditar != null) {
@@ -275,7 +257,8 @@ public class CursoListar extends javax.swing.JFrame {
             // 7. Cria a tela de Edição.
             //    (ASSUMINDO QUE VOCÊ VAI MUDAR CursoEditar para ser um JDialog,
             //    assim como o CursoAdicionar)
-            CursoEditar telaEditar = new CursoEditar(this, true, cursoParaEditar);
+//                                                1. Pai  2. Modal  3. O CURSO       4. O CONTROLLER
+            CursoEditar telaEditar = new CursoEditar(this, true, cursoParaEditar, this.cursoController);
 
             // 8. Mostra a tela de edição. O código PAUSA AQUI.
             telaEditar.setVisible(true);
@@ -323,7 +306,7 @@ public class CursoListar extends javax.swing.JFrame {
         // 6. Verifica se o usuário clicou em "SIM" (YES_OPTION)
         if (confirm == JOptionPane.YES_OPTION) {
 
-            CursoIController cursoController = new CursoController();
+            CursoIController cursoController = this.cursoController;
             try {
                 // 7. Busca o objeto 'Curso' COMPLETO usando o código
                 Curso cursoParaExcluir = cursoController.buscarPorCodigo(codigoCurso);
