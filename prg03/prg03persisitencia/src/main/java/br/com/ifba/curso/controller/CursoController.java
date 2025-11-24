@@ -33,25 +33,25 @@ public class CursoController implements CursoIController {
      * Recebe um curso da Tela e manda o Service salvar.
      */
     @Override
-    public Curso salvar(Curso curso) {
+    public Curso save(Curso curso) {
         // O Controller é preguiçoso: ele só repassa a tarefa.
-        return cursoService.salvar(curso);
+        return cursoService.save(curso);
     }
 
     /**
      * Recebe um curso já modificado da Tela e manda o Service atualizar.
      */
     @Override
-    public Curso atualizar(Curso curso) {
-        return cursoService.atualizar(curso);
+    public Curso update(Curso curso) {
+        return cursoService.update(curso);
     }
 
     /**
      * Recebe o pedido de exclusão e repassa.
      */
     @Override
-    public void excluir(Curso curso) {
-        cursoService.excluir(curso);
+    public void delete(Curso curso) {
+        cursoService.delete(curso);
     }
 
     /**
@@ -59,15 +59,15 @@ public class CursoController implements CursoIController {
      * devolve tudo de volta pra Tela.
      */
     @Override
-    public List<Curso> listarTodos() {
-        return cursoService.listarTodos();
+    public List<Curso> findAll() {
+        return cursoService.findAll();
     }
 
     /**
      * Busca específica por código.
      */
     @Override
-    public Curso buscarPorCodigo(String codigo) {
-        return cursoService.buscarPorCodigo(codigo);
+    public Curso findByCodigoCurso(String codigo) {
+        return cursoService.findByCodigoCurso(codigo);
     }
 }

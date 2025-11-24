@@ -19,14 +19,14 @@ public interface CursoIService {
 
     // Métodos abstratos (sem código). A classe que implementar isso (CursoService)
     // será OBRIGADA a escrever o código dessas regras.
-    public abstract Curso salvar(Curso curso);
+    public abstract Curso save(Curso curso);
 
-    public abstract Curso atualizar(Curso curso);
+    public abstract Curso update(Curso curso);
 
-    public abstract void excluir(Curso curso);
+    public abstract void delete(Curso curso);
 
-    public abstract List<Curso> listarTodos();
+    public abstract List<Curso> findAll();
 
-    public abstract Curso buscarPorCodigo(String codigo);
+    public abstract Curso findByCodigoCurso(String codigo);
 
 }

@@ -126,7 +126,7 @@ public class CursoAdicionar extends javax.swing.JDialog {
         try {
             // Chama o Controller que recebemos. O Controller aciona o Service, que valida
             // e manda o DAO salvar no banco.
-            this.cursoController.salvar(curso); // <--- Usa o Controller INJETADO!
+            this.cursoController.save(curso); // <--- Usa o Controller INJETADO!
 
             // SUCESSO
             JOptionPane.showMessageDialog(this, "Curso criado com sucesso", "Sucesso", JOptionPane.INFORMATION_MESSAGE);

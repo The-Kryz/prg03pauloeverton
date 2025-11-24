@@ -199,7 +199,7 @@ public class CursoListar extends javax.swing.JFrame {
         model.setRowCount(0); // Limpa a tabela para evitar duplicatas
 
         // O Controller injetado é usado para buscar os dados.
-        List<Curso> cursos = this.cursoController.listarTodos(); // <- CHAMA O MUNDO SPRING
+        List<Curso> cursos = this.cursoController.findAll(); // <- CHAMA O MUNDO SPRING
 
         if (cursos != null) {
             for (Curso curso : cursos) {
@@ -249,7 +249,7 @@ public class CursoListar extends javax.swing.JFrame {
         String codigoCurso = (String) tblCurso.getModel().getValueAt(modelRow, 1);
 
         // 5. USA O DAO para buscar o objeto 'Curso' COMPLETO no banco
-        Curso cursoParaEditar = this.cursoController.buscarPorCodigo(codigoCurso);
+        Curso cursoParaEditar = this.cursoController.findByCodigoCurso(codigoCurso);
 
         // 6. Verifica se o curso foi encontrado
         if (cursoParaEditar != null) {
@@ -309,11 +309,11 @@ public class CursoListar extends javax.swing.JFrame {
             CursoIController cursoController = this.cursoController;
             try {
                 // 7. Busca o objeto 'Curso' COMPLETO usando o código
-                Curso cursoParaExcluir = cursoController.buscarPorCodigo(codigoCurso);
+                Curso cursoParaExcluir = cursoController.findByCodigoCurso(codigoCurso);
 
                 if (cursoParaExcluir != null) {
                     // 8. Chama o método de excluir do DAO
-                    cursoController.excluir(cursoParaExcluir);
+                    cursoController.delete(cursoParaExcluir);
 
                     // 9. Mostra mensagem de sucesso
                     JOptionPane.showMessageDialog(this, "Curso excluído com sucesso!");

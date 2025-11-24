@@ -136,7 +136,7 @@ public class CursoEditar extends javax.swing.JDialog {
             // PONTO CHAVE: Usamos o método 'atualizar'.
             // Por quê? Porque 'cursoParaEditar' já existe no banco (tem ID).
             // Se usássemos 'salvar', o Hibernate daria erro de "detached entity".
-            this.cursoController.atualizar(this.cursoParaEditar); // <--- ATUALIZAR (MERGE)
+            this.cursoController.update(this.cursoParaEditar); // <--- ATUALIZAR (MERGE)
 
             // SUCESSO
             JOptionPane.showMessageDialog(this, "Curso atualizado com sucesso!");

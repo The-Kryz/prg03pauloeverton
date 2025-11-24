@@ -4,8 +4,8 @@
  */
 package br.com.ifba.curso.service;
 
-import br.com.ifba.curso.dao.CursoIDao; // Importamos a INTERFACE do DAO (boas práticas)
 import br.com.ifba.curso.entity.Curso;
+import br.com.ifba.curso.repository.CursoRepository;
 import br.com.ifba.infrastructure.util.StringUtil; // Sua classe utilitária para checar textos
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,14 +25,14 @@ public class CursoService implements CursoIService {
     // @Autowired: O Gerente precisa do Estoquista (DAO) para trabalhar.
     // O Spring traz o DAO pronto e conecta aqui.
     @Autowired
-    private CursoIDao cursoDao;
+    private CursoRepository cursoRepository;
 
     /**
      * Método Salvar (Criar Novo). Aqui aplicamos as regras de validação
      * (negócio).
      */
     @Override
-    public Curso salvar(Curso curso) {
+    public Curso save(Curso curso) {
 
         // REGRA 1: Validar Nome
         // Usamos o StringUtil para ver se é nulo ou vazio ("").
@@ -50,14 +50,14 @@ public class CursoService implements CursoIService {
 
         // SUCESSO: Se passou pelos IFs acima, o dado é confiável.
         // Mandamos o Estoquista (DAO) guardar no banco.
-        return cursoDao.salvar(curso);
+        return cursoRepository.save(curso);
     }
 
     /**
      * Método Atualizar (Editar Existente).
      */
     @Override
-    public Curso atualizar(Curso curso) {
+    public Curso update(Curso curso) {
         // Também validamos na atualização. Ninguém pode apagar o nome do curso
         // e tentar salvar vazio.
         if (StringUtil.isNullOrEmpty(curso.getNome())) {
@@ -65,21 +65,21 @@ public class CursoService implements CursoIService {
         }
 
         // Chama o método 'atualizar' (merge) do DAO.
-        return cursoDao.atualizar(curso);
+        return cursoRepository.save(curso);
     }
 
     /**
      * Método Excluir.
      */
     @Override
-    public void excluir(Curso curso) {
+    public void delete(Curso curso) {
         // Validação básica: não dá pra excluir o "nada".
         if (curso == null) {
             throw new RuntimeException("O curso para excluir não pode ser nulo.");
         }
 
         // Manda o DAO remover.
-        cursoDao.excluir(curso);
+        cursoRepository.delete(curso);
     }
 
     /**
@@ -87,15 +87,15 @@ public class CursoService implements CursoIService {
      * para o DAO.
      */
     @Override
-    public List<Curso> listarTodos() {
-        return cursoDao.listarTodos();
+    public List<Curso> findAll() {
+        return cursoRepository.findAll();
     }
 
     /**
      * Método Buscar Específico.
      */
     @Override
-    public Curso buscarPorCodigo(String codigo) {
-        return cursoDao.buscarPorCodigo(codigo);
+    public Curso findByCodigoCurso(String codigoCurso) {
+        return cursoRepository.findByCodigoCurso(codigoCurso);
     }
 }
