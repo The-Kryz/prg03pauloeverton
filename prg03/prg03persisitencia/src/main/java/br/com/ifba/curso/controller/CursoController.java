@@ -1,73 +1,46 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package br.com.ifba.curso.controller;
 
 import br.com.ifba.curso.entity.Curso;
-import br.com.ifba.curso.service.CursoIService;
+import br.com.ifba.curso.service.CursoService;
 import java.util.List;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
-/**
- * CLASSE CONTROLLER (O GARÇOM) * Função: Fazer a ponte entre a TELA (View) e a
- * REGRA DE NEGÓCIO (Service). Analogia: É o garçom do restaurante. A tela
- * (cliente) faz o pedido para ele, e ele repassa o pedido para o cozinheiro
- * (Service). O Controller NÃO cozinha (não tem regra de negócio) e NÃO planta
- * os ingredientes (não acessa o banco).
- */
-@Controller // <--- ETIQUETA DO SPRING
-// Essa anotação diz: "Spring, esta classe é um Controlador.
-// Gerencie ela para mim e deixe ela disponível para ser usada nas Telas."
+@Controller
+@RequiredArgsConstructor
+@Slf4j
 public class CursoController implements CursoIController {
 
-    // @Autowired: A MÁGICA DA INJEÇÃO DE DEPENDÊNCIA.
-    // Em vez de fazermos 'cursoService = new CursoService()', o Spring
-    // cria o Service, deixa ele pronto na memória e "injeta" aqui dentro.
-    // É como se o restaurante já te desse o cozinheiro contratado e pronto.
-    @Autowired
-    private CursoIService cursoService;
+    private final CursoService cursoService;
 
-    /**
-     * Recebe um curso da Tela e manda o Service salvar.
-     */
-    @Override
-    public Curso save(Curso curso) {
-        // O Controller é preguiçoso: ele só repassa a tarefa.
-        return cursoService.save(curso);
-    }
-
-    /**
-     * Recebe um curso já modificado da Tela e manda o Service atualizar.
-     */
-    @Override
-    public Curso update(Curso curso) {
-        return cursoService.update(curso);
-    }
-
-    /**
-     * Recebe o pedido de exclusão e repassa.
-     */
-    @Override
-    public void delete(Curso curso) {
-        cursoService.delete(curso);
-    }
-
-    /**
-     * A Tela pede a lista, o Controller pede pro Service, que pede pro DAO... e
-     * devolve tudo de volta pra Tela.
-     */
     @Override
     public List<Curso> findAll() {
+        log.info("Controller: Solicitando lista de todos os cursos.");
         return cursoService.findAll();
     }
 
-    /**
-     * Busca específica por código.
-     */
     @Override
-    public Curso findByCodigoCurso(String codigo) {
-        return cursoService.findByCodigoCurso(codigo);
+    public Curso save(Curso curso) {
+        log.info("Controller: Recebendo pedido para salvar curso: {}", curso.getNome());
+        return cursoService.save(curso);
+    }
+
+    @Override
+    public Curso update(Curso curso) {
+        log.info("Controller: Recebendo pedido para atualizar curso ID: {}", curso.getId());
+        return cursoService.update(curso);
+    }
+
+    @Override
+    public void delete(Curso curso) {
+        log.info("Controller: Recebendo pedido para deletar curso.");
+        cursoService.delete(curso);
+    }
+
+    @Override
+    public Curso findByCodigoCurso(String codigoCurso) {
+        log.info("Controller: Buscando curso por código: {}", codigoCurso);
+        return cursoService.findByCodigoCurso(codigoCurso);
     }
 }
